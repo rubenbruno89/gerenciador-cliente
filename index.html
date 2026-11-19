@@ -1,0 +1,1494 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IPTV Pro — Gerenciador Local</title>
+<style>
+:root {
+  color-scheme: dark;
+  --bg: #08090d;
+  --card: #141820;
+  --card2: #1d2330;
+  --border: #343c4b;
+  --text: #f5f7fa;
+  --muted: #aab3c1;
+  --red: #dc3545;
+  --green: #159b61;
+  --blue: #3176d3;
+  --purple: #7651c4;
+  --teal: #008f94;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+button, input, select, textarea { font: inherit; }
+button { cursor: pointer; }
+button:disabled { opacity: .55; cursor: not-allowed; }
+.container { max-width: 1300px; margin: auto; padding: 20px; }
+header {
+  background: linear-gradient(120deg, #11151c, #202631);
+  border-bottom: 1px solid var(--border);
+}
+.header-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  flex-wrap: wrap;
+}
+h1 { margin: 0 0 5px; font-size: clamp(24px, 4vw, 36px); }
+h2 { margin: 0; font-size: 24px; }
+h3 { margin: 0 0 12px; }
+p { line-height: 1.5; }
+small, .muted { color: var(--muted); }
+.actions, .row-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.btn {
+  border: 0;
+  border-radius: 10px;
+  padding: 11px 15px;
+  color: white;
+  font-weight: 700;
+  background: #394253;
+}
+.btn:hover { filter: brightness(1.14); }
+.btn.red { background: var(--red); }
+.btn.green { background: var(--green); }
+.btn.blue { background: var(--blue); }
+.btn.purple { background: var(--purple); }
+.btn.teal { background: var(--teal); }
+.btn.small { padding: 7px 9px; font-size: 14px; }
+.btn.outline {
+  background: transparent;
+  border: 1px solid var(--border);
+}
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 15px;
+  padding: 18px;
+}
+.stats {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 12px;
+  margin: 18px 0;
+}
+.stat-label { color: var(--muted); font-size: 13px; }
+.stat-value { font-size: 28px; font-weight: 800; margin-top: 5px; }
+.green-text { color: #6fe0a0; }
+.yellow-text { color: #ffd475; }
+.red-text { color: #ff8888; }
+.teal-text { color: #75e2e6; }
+.alert {
+  background: #63232c;
+  border: 1px solid #b74b58;
+  border-radius: 12px;
+  padding: 13px;
+  margin-top: 16px;
+}
+.controls {
+  display: grid;
+  grid-template-columns: 1fr 190px 190px;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.field {
+  width: 100%;
+  background: var(--card2);
+  color: white;
+  border: 1px solid #465064;
+  border-radius: 10px;
+  padding: 11px 12px;
+  outline: none;
+}
+.field:focus { border-color: #78a7e5; }
+label {
+  display: block;
+  font-size: 14px;
+  font-weight: 650;
+  margin: 0 0 6px;
+}
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+}
+.form-grid .full { grid-column: 1 / -1; }
+.toolbar { margin: 12px 0 18px; }
+.table-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; min-width: 980px; }
+th, td { text-align: left; padding: 13px 11px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+th { background: #27303d; font-size: 12px; text-transform: uppercase; letter-spacing: .04em; }
+td { font-size: 14px; }
+td code { overflow-wrap: anywhere; }
+tr:hover td { background: #1b212c; }
+.badge {
+  display: inline-block;
+  padding: 4px 7px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 750;
+}
+.badge.ok { background: #184b35; color: #a2f4c5; }
+.badge.no { background: #57252b; color: #ffb3b3; }
+.badge.soon { background: #5a431b; color: #ffe29f; }
+.modal {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  background: rgba(0,0,0,.86);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 15px;
+  overflow: auto;
+}
+.modal.open { display: flex; }
+.modal-box {
+  background: #151b25;
+  border: 1px solid #586276;
+  border-radius: 17px;
+  padding: 23px;
+  width: min(100%, 720px);
+  max-height: calc(100vh - 30px);
+  overflow: auto;
+}
+.modal-box.wide { width: min(100%, 970px); }
+.modal-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+.modal-foot { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 20px; }
+.panel {
+  background: #202836;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 15px;
+  margin-top: 14px;
+}
+.templates { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 15px; }
+.templates .btn.active { background: var(--green); }
+.wa-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+textarea { resize: vertical; }
+.preview {
+  background: #e7dfd1;
+  padding: 13px;
+  border-radius: 12px;
+  color: #101510;
+  min-height: 245px;
+}
+.bubble {
+  background: #dcf8c6;
+  padding: 13px;
+  border-radius: 10px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  line-height: 1.45;
+  font-size: 14px;
+}
+.backup-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.notice {
+  border-left: 4px solid #e7bb62;
+  padding: 10px 12px;
+  background: #403519;
+  border-radius: 6px;
+}
+.history-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 9px;
+  border-bottom: 1px solid var(--border);
+}
+.code-box {
+  font: 12px/1.5 ui-monospace, SFMono-Regular, Consolas, monospace;
+  overflow-wrap: anywhere;
+}
+#message {
+  position: fixed;
+  right: 16px;
+  top: 16px;
+  z-index: 100;
+  max-width: min(400px, calc(100vw - 32px));
+  background: #204e3b;
+  border: 1px solid #5bd397;
+  color: white;
+  padding: 13px;
+  border-radius: 10px;
+  box-shadow: 0 8px 30px #0008;
+  display: none;
+}
+#message.error { background: #682b31; border-color: #e76b75; }
+footer { text-align: center; color: var(--muted); font-size: 13px; padding: 22px; }
+@media (max-width: 850px) {
+  .stats { grid-template-columns: repeat(2, 1fr); }
+  .controls, .backup-grid, .wa-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 550px) {
+  .form-grid { grid-template-columns: 1fr; }
+  .form-grid .full { grid-column: auto; }
+  .container { padding: 14px; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="container header-content">
+    <div>
+      <h1>📺 Gerenciador IPTV Pro</h1>
+      <small>Loja: <strong id="company-display">IPTV Pro</strong> · Dados e backups somente locais</small>
+    </div>
+    <div class="actions">
+      <button class="btn teal" id="open-pix">💰 PIX</button>
+      <button class="btn blue" id="open-config">⚙️ Configurações</button>
+      <button class="btn purple" id="open-backup">💾 Backup</button>
+      <button class="btn red" id="add-client">➕ Cliente</button>
+    </div>
+  </div>
+</header>
+
+<main class="container">
+  <div id="alert" class="alert" hidden></div>
+
+  <section class="stats">
+    <div class="card"><div class="stat-label">Total de clientes</div><div class="stat-value" id="stat-total">0</div></div>
+    <div class="card"><div class="stat-label">Ativos</div><div class="stat-value green-text" id="stat-active">0</div></div>
+    <div class="card"><div class="stat-label">Vencendo em 7 dias</div><div class="stat-value yellow-text" id="stat-soon">0</div></div>
+    <div class="card"><div class="stat-label">Vencidos</div><div class="stat-value red-text" id="stat-expired">0</div></div>
+    <div class="card"><div class="stat-label">Receita estimada dos ativos</div><div class="stat-value teal-text" id="stat-revenue">R$ 0,00</div></div>
+  </section>
+
+  <div class="controls">
+    <input class="field" id="search" placeholder="Buscar nome, usuário, WhatsApp ou servidor">
+    <select class="field" id="filter">
+      <option value="all">Todos os clientes</option>
+      <option value="active">Ativos</option>
+      <option value="inactive">Inativos</option>
+      <option value="soon">Vencendo em 7 dias</option>
+      <option value="expired">Vencidos</option>
+    </select>
+    <select class="field" id="sort">
+      <option value="expiry">Ordenar: vencimento</option>
+      <option value="name">Ordenar: nome</option>
+      <option value="recent">Ordenar: recentes</option>
+    </select>
+  </div>
+
+  <div class="actions toolbar">
+    <button class="btn green" id="collect">💬 Cobrar vencimentos</button>
+    <button class="btn purple" id="quick-export">⬇️ Exportar backup .db</button>
+  </div>
+
+  <div class="card table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Cliente</th>
+          <th>Acesso</th>
+          <th>Servidor</th>
+          <th>Plano</th>
+          <th>Status</th>
+          <th>Vencimento</th>
+          <th>WhatsApp</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody id="client-rows"></tbody>
+    </table>
+  </div>
+</main>
+
+<footer>
+  <span id="last-backup">Nenhum backup exportado.</span>
+  · Ctrl+N: novo cliente · Ctrl+B: backup · Ctrl+S: exportar .db
+</footer>
+
+<div id="message" role="status" aria-live="polite"></div>
+
+<!-- CLIENTE -->
+<div class="modal" id="client-modal" role="dialog" aria-modal="true" aria-labelledby="client-modal-title">
+  <div class="modal-box">
+    <div class="modal-head">
+      <h2 id="client-modal-title">Adicionar cliente</h2>
+      <button class="btn outline close-modal" type="button">✕</button>
+    </div>
+    <form id="client-form">
+      <div class="form-grid">
+        <div><label for="client-name">Nome *</label><input class="field" id="client-name" required maxlength="120"></div>
+        <div><label for="client-phone">WhatsApp com DDD *</label><input class="field" id="client-phone" required inputmode="tel" placeholder="(11) 99999-9999"></div>
+        <div><label for="client-user">Usuário *</label><input class="field" id="client-user" required></div>
+        <div><label for="client-password">Senha *</label><input class="field" id="client-password" type="password" required></div>
+        <div><label for="client-server">Servidor *</label><input class="field" id="client-server" required placeholder="http://servidor:8080"></div>
+        <div><label for="client-expiry">Data de vencimento *</label><input class="field" id="client-expiry" type="date" required></div>
+        <div>
+          <label for="client-plan">Plano</label>
+          <select class="field" id="client-plan">
+            <option>Mensal</option><option>Trimestral</option><option>Semestral</option>
+            <option>Anual</option><option>Teste</option>
+          </select>
+        </div>
+        <div><label for="client-value">Valor R$</label><input class="field" id="client-value" type="number" min="0" step="0.01"></div>
+        <div>
+          <label for="client-status">Status</label>
+          <select class="field" id="client-status">
+            <option value="ativo">Ativo</option>
+            <option value="inativo">Inativo</option>
+          </select>
+        </div>
+        <div><label for="client-notes">Observações</label><input class="field" id="client-notes"></div>
+      </div>
+      <div class="modal-foot">
+        <button class="btn red" type="submit">💾 Salvar cliente</button>
+        <button class="btn outline close-modal" type="button">Cancelar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- WHATSAPP -->
+<div class="modal" id="wa-modal" role="dialog" aria-modal="true" aria-labelledby="wa-title">
+  <div class="modal-box wide">
+    <div class="modal-head">
+      <h2 id="wa-title">Mensagem para WhatsApp</h2>
+      <button class="btn outline close-modal" type="button">✕</button>
+    </div>
+    <p id="wa-recipient" class="muted"></p>
+    <p class="muted">As mensagens abaixo não contêm emojis. A senha aparece somente no modelo de boas-vindas.</p>
+    <div class="templates" id="wa-templates"></div>
+    <div class="wa-grid">
+      <div>
+        <label for="wa-text">Editar mensagem</label>
+        <textarea class="field" id="wa-text" rows="16"></textarea>
+        <small id="wa-count"></small>
+      </div>
+      <div>
+        <label>Pré-visualização</label>
+        <div class="preview"><div class="bubble" id="wa-preview"></div></div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn blue" id="wa-copy" type="button">📋 Copiar mensagem</button>
+      <button class="btn green" id="wa-send" type="button">Abrir WhatsApp</button>
+      <button class="btn outline close-modal" type="button">Fechar</button>
+    </div>
+  </div>
+</div>
+
+<!-- BACKUP -->
+<div class="modal" id="backup-modal" role="dialog" aria-modal="true" aria-labelledby="backup-title">
+  <div class="modal-box wide">
+    <div class="modal-head">
+      <h2 id="backup-title">💾 Backup local — Importar e Exportar</h2>
+      <button class="btn outline close-modal" type="button">✕</button>
+    </div>
+    <div class="notice">
+      Os arquivos exportados incluem clientes, senhas e configurações PIX.
+      Guarde-os em local seguro. Não existe sincronização automática entre aparelhos.
+    </div>
+    <div class="backup-grid">
+      <section class="panel">
+        <h3>⬇️ Exportar backup</h3>
+        <p class="muted">Baixe um arquivo completo para guardar ou transferir para outro aparelho.</p>
+        <div class="actions">
+          <button class="btn blue export-btn" data-ext="db" type="button">Exportar .db</button>
+          <button class="btn purple export-btn" data-ext="bd" type="button">Exportar .bd</button>
+          <button class="btn green export-btn" data-ext="json" type="button">Exportar .json</button>
+          <button class="btn outline export-btn" data-ext="csv" type="button">Exportar .csv</button>
+        </div>
+        <p><small>`.db`, `.bd` e `.json` contêm o mesmo backup JSON completo. CSV serve para planilhas e não pode ser importado aqui.</small></p>
+      </section>
+
+      <section class="panel">
+        <h3>⬆️ Importar backup</h3>
+        <p class="muted">Selecione um backup gerado por este painel ou pelas versões anteriores.</p>
+        <button class="btn teal" id="import-button" type="button">📂 Importar arquivo</button>
+        <input id="import-file" type="file" accept=".db,.bd,.json,application/json" hidden>
+        <p><small>Ao importar, escolha entre substituir os clientes atuais ou mesclar os registros.</small></p>
+      </section>
+    </div>
+
+    <section class="panel">
+      <h3>Histórico neste navegador</h3>
+      <p class="muted">Cópias recentes salvas no próprio navegador. Não substituem a exportação para arquivo.</p>
+      <div id="history-list"></div>
+    </section>
+  </div>
+</div>
+
+<!-- CONFIGURAÇÕES -->
+<div class="modal" id="config-modal" role="dialog" aria-modal="true" aria-labelledby="config-title">
+  <div class="modal-box">
+    <div class="modal-head">
+      <h2 id="config-title">⚙️ Configurações e chave PIX</h2>
+      <button class="btn outline close-modal" type="button">✕</button>
+    </div>
+    <form id="config-form">
+      <div class="form-grid">
+        <div><label for="cfg-company">Nome da loja</label><input class="field" id="cfg-company"></div>
+        <div><label for="cfg-value">Valor padrão R$</label><input class="field" id="cfg-value" type="number" min="0" step="0.01"></div>
+        <div>
+          <label for="cfg-pix-type">Tipo da chave PIX</label>
+          <select class="field" id="cfg-pix-type">
+            <option>Aleatória</option><option>CPF</option><option>CNPJ</option>
+            <option>Telefone</option><option>E-mail</option>
+          </select>
+        </div>
+        <div><label for="cfg-pix-key">Chave PIX</label><input class="field" id="cfg-pix-key" placeholder="Informe a chave que recebe os pagamentos"></div>
+        <div><label for="cfg-pix-name">Nome do recebedor</label><input class="field" id="cfg-pix-name" maxlength="25"></div>
+        <div><label for="cfg-pix-city">Cidade do recebedor</label><input class="field" id="cfg-pix-city" maxlength="15"></div>
+        <div class="full"><label for="cfg-support">Informação adicional de suporte</label><input class="field" id="cfg-support"></div>
+      </div>
+      <p><small>Para gerar o PIX copia e cola, preencha chave, nome do recebedor e cidade. Confira os dados no aplicativo do banco antes de cobrar.</small></p>
+      <div class="modal-foot">
+        <button class="btn green" type="submit">Salvar configurações</button>
+        <button class="btn outline close-modal" type="button">Cancelar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- PIX -->
+<div class="modal" id="pix-modal" role="dialog" aria-modal="true" aria-labelledby="pix-title">
+  <div class="modal-box">
+    <div class="modal-head">
+      <h2 id="pix-title">💰 Cobrança PIX</h2>
+      <button class="btn outline close-modal" type="button">✕</button>
+    </div>
+    <p id="pix-client-label" class="muted"></p>
+    <div class="panel">
+      <p>Chave PIX: <strong id="pix-key-display">Não cadastrada</strong></p>
+      <button class="btn blue" id="pix-copy-key" type="button">Copiar chave PIX</button>
+    </div>
+    <div class="form-grid" style="margin-top:14px">
+      <div><label for="pix-amount">Valor R$</label><input class="field" id="pix-amount" type="number" min="0" step="0.01"></div>
+      <div><label for="pix-txid">Identificador</label><input class="field" id="pix-txid" maxlength="25"></div>
+      <div class="full">
+        <label for="pix-code">PIX copia e cola</label>
+        <textarea class="field code-box" id="pix-code" rows="6" readonly></textarea>
+      </div>
+    </div>
+    <p id="pix-help" class="muted"></p>
+    <div class="modal-foot">
+      <button class="btn green" id="pix-copy-code" type="button">Copiar PIX copia e cola</button>
+      <button class="btn teal" id="pix-whatsapp" type="button">Cobrar pelo WhatsApp</button>
+      <button class="btn outline close-modal" type="button">Fechar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+"use strict";
+
+/*
+ * Compatibilidade com as versões anteriores:
+ * clientes: iptv-clients
+ * configurações: iptv-config
+ * histórico: iptv-backup-history
+ *
+ * Não há chamadas fetch nem backup na nuvem.
+ */
+
+const KEY_CLIENTS = "iptv-clients";
+const KEY_CONFIG = "iptv-config";
+const KEY_HISTORY = "iptv-backup-history";
+const KEY_LAST_BACKUP = "iptv-last-backup";
+
+const $ = id => document.getElementById(id);
+
+function readJSON(key, fallback) {
+  try {
+    const value = localStorage.getItem(key);
+    return value ? JSON.parse(value) : fallback;
+  } catch {
+    return fallback;
+  }
+}
+
+let clients = readJSON(KEY_CLIENTS, []);
+if (!Array.isArray(clients)) clients = [];
+
+let config = {
+  companyName: "IPTV Pro",
+  planValue: "29.90",
+  pixType: "Aleatória",
+  pixKey: "",
+  pixName: "",
+  pixCity: "",
+  support: ""
+};
+const storedConfig = readJSON(KEY_CONFIG, {});
+if (storedConfig && typeof storedConfig === "object" && !Array.isArray(storedConfig)) {
+  config = { ...config, ...storedConfig };
+}
+
+let history = readJSON(KEY_HISTORY, []);
+if (!Array.isArray(history)) history = [];
+
+let editingId = null;
+let selectedWaId = null;
+let selectedPixId = null;
+let toastTimer;
+
+function text(value) {
+  return String(value ?? "");
+}
+
+function esc(value) {
+  return text(value).replace(/[&<>"']/g, char => ({
+    "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+  })[char]);
+}
+
+function notify(message, error = false) {
+  const box = $("message");
+  box.textContent = message;
+  box.classList.toggle("error", error);
+  box.style.display = "block";
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => box.style.display = "none", 4500);
+}
+
+function money(value) {
+  const number = Number(text(value).replace(",", "."));
+  return Number.isFinite(number)
+    ? number.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })
+    : "R$ 0,00";
+}
+
+function amount(value) {
+  const number = Number(text(value).replace(",", "."));
+  return Number.isFinite(number) && number >= 0 ? number : 0;
+}
+
+function dateBR(value) {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(text(value))) return "Não definida";
+  const [year, month, day] = value.split("-");
+  return `${day}/${month}/${year}`;
+}
+
+function dateAtMidnight(value) {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(text(value))) return null;
+  const [year, month, day] = value.split("-").map(Number);
+  const date = new Date(year, month - 1, day);
+  if (
+    date.getFullYear() !== year ||
+    date.getMonth() !== month - 1 ||
+    date.getDate() !== day
+  ) return null;
+  return date;
+}
+
+function daysUntil(value) {
+  const expiry = dateAtMidnight(value);
+  if (!expiry) return Infinity;
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  return Math.round((expiry - today) / 86400000);
+}
+
+function phoneNumber(value) {
+  let digits = text(value).replace(/\D/g, "");
+  if (/^55\d{10,11}$/.test(digits)) return digits;
+  if (/^\d{10,11}$/.test(digits)) return "55" + digits;
+  return null;
+}
+
+function byId(id) {
+  return clients.find(client => text(client.id) === text(id));
+}
+
+function uniqueId() {
+  return typeof crypto !== "undefined" && crypto.randomUUID
+    ? crypto.randomUUID()
+    : `client-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+}
+
+function openModal(id) {
+  $(id).classList.add("open");
+}
+
+function closeModal(id) {
+  $(id).classList.remove("open");
+}
+
+function backupData(clientList = clients, cfg = config) {
+  return {
+    app: "IPTV-Pro",
+    version: "5.0-local",
+    exportedAt: new Date().toISOString(),
+    config: { ...cfg },
+    total: clientList.length,
+    clients: clientList.map(client => ({ ...client }))
+  };
+}
+
+function saveHistorySnapshot() {
+  if (!clients.length && !history.length) return;
+  const snapshot = {
+    id: uniqueId(),
+    date: new Date().toISOString(),
+    total: clients.length,
+    snapshot: JSON.stringify(backupData())
+  };
+  try {
+    history = [snapshot, ...history].slice(0, 5);
+    localStorage.setItem(KEY_HISTORY, JSON.stringify(history));
+  } catch {
+    /* O histórico é opcional; o backup em arquivo continua disponível. */
+  }
+}
+
+function commitClients(nextClients) {
+  try {
+    localStorage.setItem(KEY_CLIENTS, JSON.stringify(nextClients));
+  } catch {
+    notify("Não foi possível salvar. Verifique o espaço do navegador e exporte um backup.", true);
+    return false;
+  }
+  saveHistorySnapshot();
+  clients = nextClients;
+  render();
+  return true;
+}
+
+function commitConfig(nextConfig) {
+  try {
+    localStorage.setItem(KEY_CONFIG, JSON.stringify(nextConfig));
+  } catch {
+    notify("Não foi possível salvar as configurações.", true);
+    return false;
+  }
+  config = nextConfig;
+  render();
+  return true;
+}
+
+function render() {
+  $("company-display").textContent = config.companyName || "IPTV Pro";
+
+  $("stat-total").textContent = clients.length;
+  $("stat-active").textContent = clients.filter(c => c.status === "ativo").length;
+  $("stat-soon").textContent = clients.filter(c => {
+    const days = daysUntil(c.expiry);
+    return days >= 0 && days <= 7;
+  }).length;
+  $("stat-expired").textContent = clients.filter(c => daysUntil(c.expiry) < 0).length;
+
+  const revenue = clients
+    .filter(c => c.status === "ativo")
+    .reduce((total, c) => total + amount(c.value || config.planValue), 0);
+  $("stat-revenue").textContent = money(revenue);
+
+  const expired = clients.filter(c => daysUntil(c.expiry) < 0).length;
+  const soon = clients.filter(c => {
+    const days = daysUntil(c.expiry);
+    return days >= 0 && days <= 7;
+  }).length;
+  $("alert").hidden = !expired && !soon;
+  $("alert").textContent = expired
+    ? `🚨 ${expired} cliente(s) com vencimento passado.`
+    : `⚠️ ${soon} cliente(s) vencendo em até 7 dias.`;
+
+  const query = $("search").value.trim().toLowerCase();
+  const filter = $("filter").value;
+  const sort = $("sort").value;
+
+  let visible = clients.filter(c => {
+    const searchable = [c.name, c.username, c.whatsapp, c.server]
+      .map(text).join(" ").toLowerCase();
+    if (query && !searchable.includes(query)) return false;
+
+    const days = daysUntil(c.expiry);
+    if (filter === "active") return c.status === "ativo";
+    if (filter === "inactive") return c.status === "inativo";
+    if (filter === "soon") return days >= 0 && days <= 7;
+    if (filter === "expired") return days < 0;
+    return true;
+  });
+
+  visible = [...visible];
+  if (sort === "name") {
+    visible.sort((a, b) => text(a.name).localeCompare(text(b.name), "pt-BR"));
+  } else if (sort === "recent") {
+    visible.reverse();
+  } else {
+    visible.sort((a, b) => daysUntil(a.expiry) - daysUntil(b.expiry));
+  }
+
+  const tbody = $("client-rows");
+  tbody.replaceChildren();
+
+  if (!visible.length) {
+    const tr = document.createElement("tr");
+    tr.innerHTML = '<td colspan="8" style="text-align:center;padding:35px;color:#aab3c1">Nenhum cliente encontrado.</td>';
+    tbody.appendChild(tr);
+  }
+
+  for (const c of visible) {
+    const days = daysUntil(c.expiry);
+    const dateClass = days <= 0 ? "no" : days <= 7 ? "soon" : "ok";
+    const description = !Number.isFinite(days)
+      ? "Sem data"
+      : days < 0
+        ? `Vencido há ${Math.abs(days)} dia(s)`
+        : days === 0
+          ? "Vence hoje"
+          : `Faltam ${days} dia(s)`;
+
+    const row = document.createElement("tr");
+    row.dataset.id = text(c.id);
+    row.innerHTML = `
+      <td><strong>${esc(c.name)}</strong><br><small>${esc(c.notes || "")}</small></td>
+      <td>
+        <code>${esc(c.username)}</code><br>
+        <span class="muted">Senha: ••••••••</span>
+        <button class="btn small outline" data-action="copy-user" type="button" title="Copiar usuário">📋</button>
+      </td>
+      <td><code>${esc(c.server)}</code></td>
+      <td>${esc(c.plan || "Mensal")}<br><small>${money(c.value || config.planValue)}</small></td>
+      <td><button class="btn small ${c.status === "ativo" ? "green" : "red"}"
+        data-action="status" type="button">${c.status === "ativo" ? "Ativo" : "Inativo"}</button></td>
+      <td>${dateBR(c.expiry)}<br><span class="badge ${dateClass}">${description}</span></td>
+      <td>${esc(c.whatsapp)}</td>
+      <td>
+        <div class="row-actions">
+          <button class="btn small teal" data-action="pix" title="PIX" type="button">💰</button>
+          <button class="btn small green" data-action="wa" title="WhatsApp" type="button">💬</button>
+          <button class="btn small" data-action="renew" title="Renovar 30 dias" type="button">🔄</button>
+          <button class="btn small blue" data-action="edit" title="Editar" type="button">✏️</button>
+          <button class="btn small red" data-action="delete" title="Excluir" type="button">🗑️</button>
+        </div>
+      </td>`;
+    tbody.appendChild(row);
+  }
+
+  const last = localStorage.getItem(KEY_LAST_BACKUP);
+  $("last-backup").textContent = last
+    ? `Última exportação iniciada: ${new Date(last).toLocaleString("pt-BR")}`
+    : "Nenhum backup exportado.";
+}
+
+function openClientForm(client = null) {
+  editingId = client ? text(client.id) : null;
+  $("client-modal-title").textContent = client ? "Editar cliente" : "Adicionar cliente";
+  $("client-name").value = client?.name || "";
+  $("client-phone").value = client?.whatsapp || "";
+  $("client-user").value = client?.username || "";
+  $("client-password").value = client?.password || "";
+  $("client-password").type = "password";
+  $("client-server").value = client?.server || "";
+  $("client-expiry").value = client?.expiry || "";
+  $("client-plan").value = client?.plan || "Mensal";
+  $("client-value").value = client?.value ?? config.planValue ?? "";
+  $("client-status").value = client?.status || "ativo";
+  $("client-notes").value = client?.notes || "";
+  openModal("client-modal");
+}
+
+$("client-form").addEventListener("submit", event => {
+  event.preventDefault();
+
+  const whatsapp = $("client-phone").value.trim();
+  const expiry = $("client-expiry").value;
+
+  if (!phoneNumber(whatsapp)) {
+    notify("Informe um WhatsApp brasileiro válido, com DDD.", true);
+    return;
+  }
+  if (!dateAtMidnight(expiry)) {
+    notify("Informe uma data de vencimento válida.", true);
+    return;
+  }
+
+  const data = {
+    name: $("client-name").value.trim(),
+    whatsapp,
+    username: $("client-user").value.trim(),
+    password: $("client-password").value,
+    server: $("client-server").value.trim(),
+    expiry,
+    plan: $("client-plan").value,
+    value: $("client-value").value,
+    status: $("client-status").value,
+    notes: $("client-notes").value.trim()
+  };
+
+  if (!data.name || !data.username || !data.password || !data.server) {
+    notify("Preencha todos os campos obrigatórios.", true);
+    return;
+  }
+
+  const next = [...clients];
+  if (editingId !== null) {
+    const index = next.findIndex(c => text(c.id) === editingId);
+    if (index < 0) {
+      notify("Cliente não encontrado.", true);
+      return;
+    }
+    next[index] = { ...next[index], ...data };
+  } else {
+    next.push({ ...data, id: uniqueId() });
+  }
+
+  if (commitClients(next)) {
+    closeModal("client-modal");
+    notify("Cliente salvo com sucesso.");
+  }
+});
+
+$("client-rows").addEventListener("click", async event => {
+  const button = event.target.closest("button[data-action]");
+  const row = button?.closest("tr[data-id]");
+  if (!button || !row) return;
+
+  const client = byId(row.dataset.id);
+  if (!client) return;
+
+  switch (button.dataset.action) {
+    case "edit":
+      openClientForm(client);
+      break;
+    case "delete":
+      if (confirm(`Excluir ${client.name}?`)) {
+        if (commitClients(clients.filter(c => text(c.id) !== text(client.id)))) {
+          notify("Cliente excluído.");
+        }
+      }
+      break;
+    case "status": {
+      const next = clients.map(c => text(c.id) === text(client.id)
+        ? { ...c, status: c.status === "ativo" ? "inativo" : "ativo" }
+        : c);
+      commitClients(next);
+      break;
+    }
+    case "renew": {
+      const base = daysUntil(client.expiry) > 0
+        ? dateAtMidnight(client.expiry)
+        : new Date();
+      base.setDate(base.getDate() + 30);
+      const year = base.getFullYear();
+      const month = String(base.getMonth() + 1).padStart(2, "0");
+      const day = String(base.getDate()).padStart(2, "0");
+      const expiry = `${year}-${month}-${day}`;
+      const next = clients.map(c => text(c.id) === text(client.id)
+        ? { ...c, expiry, status: "ativo" }
+        : c);
+      if (commitClients(next)) notify(`Renovado até ${dateBR(expiry)}.`);
+      break;
+    }
+    case "copy-user":
+      await copyText(client.username);
+      break;
+    case "wa":
+      openWhatsApp(client);
+      break;
+    case "pix":
+      openPix(client);
+      break;
+  }
+});
+
+/* MENSAGENS DO WHATSAPP: SEM EMOJIS */
+
+const templates = [
+  ["boas", "Boas-vindas"],
+  ["renovacao", "Renovação"],
+  ["urgente", "Urgente"],
+  ["hoje", "Vence hoje"],
+  ["vencido", "Vencido"],
+  ["lembrete", "Lembrete"],
+  ["suporte", "Suporte"]
+];
+
+function paymentText(client) {
+  const price = money(client.value || config.planValue);
+  const key = text(config.pixKey).trim();
+
+  if (!key) {
+    return `\n\nValor da renovação: ${price}\nSe desejar renovar, responda esta mensagem para receber os dados de pagamento.`;
+  }
+
+  return `\n\n*Pagamento via PIX*\nValor: ${price}\nChave PIX (${config.pixType || "PIX"}): ${key}\nFavorecido: ${config.pixName || config.companyName || "Recebedor"}\nApós o pagamento, envie o comprovante por esta conversa.`;
+}
+
+function whatsappMessage(type, client) {
+  const company = config.companyName || "IPTV Pro";
+  const name = client.name;
+  const expiry = dateBR(client.expiry);
+  const days = daysUntil(client.expiry);
+  const sign = `\n\nAtenciosamente,\n${company}${config.support ? "\n" + config.support : ""}`;
+
+  if (type === "boas") {
+    return `*Bem-vindo à ${company}!*\n\nOlá, ${name}. Seu acesso está disponível.\n\n*Dados de acesso*\nUsuário: ${client.username}\nSenha: ${client.password}\nServidor: ${client.server}\nVencimento: ${expiry}\n\nSe precisar de ajuda para configurar o aplicativo, responda esta mensagem.${sign}`;
+  }
+  if (type === "urgente") {
+    return `Olá, ${name}. Aqui é da ${company}.\n\nSeu acesso vence em ${days} dia(s), no dia ${expiry}. Para evitar uma interrupção, você pode renovar antecipadamente.${paymentText(client)}${sign}`;
+  }
+  if (type === "hoje") {
+    return `Olá, ${name}. Aqui é da ${company}.\n\nSeu acesso vence hoje, ${expiry}. Se desejar continuar com o serviço, entre em contato para renovar.${paymentText(client)}${sign}`;
+  }
+  if (type === "vencido") {
+    return `Olá, ${name}. Aqui é da ${company}.\n\nSeu acesso venceu em ${expiry}. Se desejar reativá-lo, realize a renovação e envie o comprovante para conferência.${paymentText(client)}${sign}`;
+  }
+  if (type === "lembrete") {
+    return `Olá, ${name}. Aqui é da ${company}.\n\nEste é um lembrete: seu acesso vence em ${expiry}. Faltam ${days} dia(s). Se quiser, podemos organizar a renovação antecipada.${sign}`;
+  }
+  if (type === "suporte") {
+    return `Olá, ${name}. Aqui é do suporte da ${company}.\n\nPara ajudá-lo, informe qual aparelho e aplicativo está usando e descreva a mensagem de erro apresentada.${sign}`;
+  }
+  return `Olá, ${name}. Aqui é da ${company}.\n\nSeu acesso vence em ${expiry}, daqui a ${days} dia(s). Para evitar interrupções, você pode renovar antecipadamente.${paymentText(client)}${sign}`;
+}
+
+function automaticTemplate(client) {
+  const days = daysUntil(client.expiry);
+  if (days < 0) return "vencido";
+  if (days === 0) return "hoje";
+  if (days <= 3) return "urgente";
+  if (days <= 7) return "renovacao";
+  return "lembrete";
+}
+
+function selectTemplate(type) {
+  const client = byId(selectedWaId);
+  if (!client) return;
+  $("wa-text").value = whatsappMessage(type, client);
+  for (const button of $("wa-templates").querySelectorAll("button")) {
+    button.classList.toggle("active", button.dataset.template === type);
+  }
+  updateWaPreview();
+}
+
+function openWhatsApp(client) {
+  selectedWaId = text(client.id);
+  $("wa-title").textContent = `Mensagem para ${client.name}`;
+  $("wa-recipient").textContent =
+    `Destino: ${client.whatsapp} · Vencimento: ${dateBR(client.expiry)}`;
+
+  $("wa-templates").replaceChildren();
+  for (const [key, label] of templates) {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "btn small";
+    button.dataset.template = key;
+    button.textContent = label;
+    button.addEventListener("click", () => selectTemplate(key));
+    $("wa-templates").appendChild(button);
+  }
+
+  selectTemplate(automaticTemplate(client));
+  openModal("wa-modal");
+}
+
+function updateWaPreview() {
+  const message = $("wa-text").value;
+  $("wa-preview").textContent = message;
+  $("wa-count").textContent = `${message.length} caracteres`;
+}
+
+$("wa-text").addEventListener("input", updateWaPreview);
+
+$("wa-copy").addEventListener("click", () => copyText($("wa-text").value));
+
+$("wa-send").addEventListener("click", () => {
+  const client = byId(selectedWaId);
+  const number = client && phoneNumber(client.whatsapp);
+  if (!number) {
+    notify("WhatsApp inválido. Edite o telefone do cliente.", true);
+    return;
+  }
+  const message = $("wa-text").value.trim();
+  if (!message) {
+    notify("Escreva a mensagem antes de enviar.", true);
+    return;
+  }
+  window.open(
+    `https://wa.me/${number}?text=${encodeURIComponent(message)}`,
+    "_blank",
+    "noopener,noreferrer"
+  );
+});
+
+/* CONFIGURAÇÕES E PIX */
+
+function openConfig() {
+  $("cfg-company").value = config.companyName || "";
+  $("cfg-value").value = config.planValue || "";
+  $("cfg-pix-type").value = config.pixType || "Aleatória";
+  $("cfg-pix-key").value = config.pixKey || "";
+  $("cfg-pix-name").value = config.pixName || "";
+  $("cfg-pix-city").value = config.pixCity || "";
+  $("cfg-support").value = config.support || "";
+  openModal("config-modal");
+}
+
+$("config-form").addEventListener("submit", event => {
+  event.preventDefault();
+
+  const next = {
+    ...config,
+    companyName: $("cfg-company").value.trim() || "IPTV Pro",
+    planValue: $("cfg-value").value || "0",
+    pixType: $("cfg-pix-type").value,
+    pixKey: $("cfg-pix-key").value.trim(),
+    pixName: $("cfg-pix-name").value.trim(),
+    pixCity: $("cfg-pix-city").value.trim(),
+    support: $("cfg-support").value.trim()
+  };
+
+  if (next.pixKey && (!next.pixName || !next.pixCity)) {
+    notify("Para gerar o PIX copia e cola, preencha nome e cidade do recebedor.", true);
+    return;
+  }
+
+  if (commitConfig(next)) {
+    closeModal("config-modal");
+    notify("Configurações e chave PIX salvas.");
+  }
+});
+
+/* PIX copia e cola gerado localmente; nenhuma requisição externa. */
+
+function ascii(value, maximum) {
+  return text(value)
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-zA-Z0-9 ]/g, "")
+    .toUpperCase()
+    .trim()
+    .slice(0, maximum);
+}
+
+function tlv(id, value) {
+  const v = text(value);
+  if (v.length > 99) throw new Error("Campo PIX excede o tamanho permitido.");
+  return id + String(v.length).padStart(2, "0") + v;
+}
+
+function crc16(payload) {
+  let crc = 0xffff;
+  for (let i = 0; i < payload.length; i++) {
+    crc ^= payload.charCodeAt(i) << 8;
+    for (let j = 0; j < 8; j++) {
+      crc = crc & 0x8000
+        ? ((crc << 1) ^ 0x1021) & 0xffff
+        : (crc << 1) & 0xffff;
+    }
+  }
+  return crc.toString(16).toUpperCase().padStart(4, "0");
+}
+
+function generatePix(key, name, city, value, txid) {
+  const pixKey = text(key).trim();
+  const receiver = ascii(name, 25);
+  const location = ascii(city, 15);
+  const identifier = text(txid).replace(/[^A-Za-z0-9]/g, "").slice(0, 25) || "***";
+
+  if (!pixKey || !receiver || !location) {
+    throw new Error("Cadastre chave, nome e cidade do recebedor nas configurações.");
+  }
+
+  const account = tlv("00", "br.gov.bcb.pix") + tlv("01", pixKey);
+
+  let payload =
+    tlv("00", "01") +
+    tlv("26", account) +
+    tlv("52", "0000") +
+    tlv("53", "986");
+
+  const number = amount(value);
+  if (number > 0) payload += tlv("54", number.toFixed(2));
+
+  payload +=
+    tlv("58", "BR") +
+    tlv("59", receiver) +
+    tlv("60", location) +
+    tlv("62", tlv("05", identifier)) +
+    "6304";
+
+  return payload + crc16(payload);
+}
+
+function openPix(client = null) {
+  selectedPixId = client ? text(client.id) : null;
+  $("pix-client-label").textContent = client
+    ? `Cliente: ${client.name} · Vencimento: ${dateBR(client.expiry)}`
+    : "Cobrança avulsa";
+  $("pix-key-display").textContent = config.pixKey || "Não cadastrada";
+  $("pix-amount").value = client?.value || config.planValue || "";
+  $("pix-txid").value = client
+    ? `IPTV${text(client.id).replace(/[^A-Za-z0-9]/g, "").slice(-12)}`
+    : `IPTV${Date.now().toString().slice(-10)}`;
+
+  updatePix();
+  openModal("pix-modal");
+}
+
+function updatePix() {
+  try {
+    $("pix-code").value = generatePix(
+      config.pixKey,
+      config.pixName,
+      config.pixCity,
+      $("pix-amount").value,
+      $("pix-txid").value
+    );
+    $("pix-help").textContent =
+      "Código gerado neste aparelho, sem enviar sua chave a serviços externos. Confirme o recebedor e o valor no aplicativo do banco.";
+  } catch (error) {
+    $("pix-code").value = "";
+    $("pix-help").textContent = error.message;
+  }
+}
+
+$("pix-amount").addEventListener("input", updatePix);
+$("pix-txid").addEventListener("input", updatePix);
+$("pix-copy-key").addEventListener("click", () => copyText(config.pixKey));
+$("pix-copy-code").addEventListener("click", () => copyText($("pix-code").value));
+$("pix-whatsapp").addEventListener("click", () => {
+  const client = byId(selectedPixId);
+  if (!client) {
+    notify("Para cobrar pelo WhatsApp, abra o PIX pelo botão de um cliente.", true);
+    return;
+  }
+  closeModal("pix-modal");
+  openWhatsApp(client);
+});
+
+/* BACKUP: EXPORTAR E IMPORTAR */
+
+function download(content, filename, mime) {
+  const blob = new Blob([content], { type: mime });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  setTimeout(() => {
+    URL.revokeObjectURL(url);
+    link.remove();
+  }, 1500);
+}
+
+function csvCell(value) {
+  let result = text(value);
+  // Evita execução acidental de fórmulas ao abrir o CSV no Excel.
+  if (/^[\s]*[=+\-@]/.test(result)) result = "'" + result;
+  return `"${result.replace(/"/g, '""')}"`;
+}
+
+function exportBackup(extension = "db") {
+  const stamp = new Date().toISOString()
+    .replace(/[:.]/g, "-")
+    .replace("T", "_")
+    .slice(0, 19);
+  const filename = `iptv-backup-${stamp}.${extension}`;
+
+  if (extension === "csv") {
+    const headers = [
+      "nome", "whatsapp", "usuario", "senha", "servidor",
+      "plano", "valor", "status", "vencimento", "observacoes"
+    ];
+    const rows = clients.map(c => [
+      c.name, c.whatsapp, c.username, c.password, c.server,
+      c.plan, c.value, c.status, c.expiry, c.notes
+    ].map(csvCell).join(";"));
+    download(
+      "\uFEFF" + [headers.join(";"), ...rows].join("\r\n"),
+      filename,
+      "text/csv;charset=utf-8"
+    );
+  } else {
+    download(
+      JSON.stringify(backupData(), null, 2),
+      filename,
+      "application/json;charset=utf-8"
+    );
+  }
+
+  try {
+    localStorage.setItem(KEY_LAST_BACKUP, new Date().toISOString());
+  } catch {}
+  render();
+  notify(`Download de ${filename} iniciado. Confira a pasta de downloads.`);
+}
+
+function validateBackup(parsed) {
+  let data = parsed;
+  if (Array.isArray(parsed)) data = { clients: parsed };
+  if (!data || typeof data !== "object" || !Array.isArray(data.clients)) {
+    throw new Error("Arquivo não contém uma lista de clientes válida.");
+  }
+
+  if (
+    data.config !== undefined &&
+    (data.config === null || typeof data.config !== "object" || Array.isArray(data.config))
+  ) {
+    throw new Error("As configurações do arquivo são inválidas.");
+  }
+
+  const normalized = data.clients.map((client, index) => {
+    if (!client || typeof client !== "object" || Array.isArray(client)) {
+      throw new Error(`Registro ${index + 1} inválido.`);
+    }
+    if (!text(client.name).trim()) {
+      throw new Error(`Registro ${index + 1} está sem nome.`);
+    }
+    if (client.expiry && !dateAtMidnight(client.expiry)) {
+      throw new Error(`Registro ${index + 1} tem vencimento inválido.`);
+    }
+    return {
+      ...client,
+      id: client.id ?? uniqueId(),
+      name: text(client.name).trim(),
+      whatsapp: text(client.whatsapp),
+      username: text(client.username),
+      password: text(client.password),
+      server: text(client.server),
+      expiry: text(client.expiry),
+      plan: text(client.plan || "Mensal"),
+      value: text(client.value ?? ""),
+      status: client.status === "inativo" ? "inativo" : "ativo",
+      notes: text(client.notes)
+    };
+  });
+
+  return { clients: normalized, config: data.config || null };
+}
+
+function importBackup(file) {
+  if (!file) return;
+  if (file.size > 20 * 1024 * 1024) {
+    notify("Arquivo maior que 20 MB. Importação cancelada.", true);
+    return;
+  }
+
+  const reader = new FileReader();
+
+  reader.onerror = () => notify("Não foi possível ler o arquivo.", true);
+
+  reader.onload = () => {
+    try {
+      const imported = validateBackup(JSON.parse(reader.result));
+      const choice = prompt(
+        `Arquivo: ${file.name}\n` +
+        `Clientes encontrados: ${imported.clients.length}\n\n` +
+        "Digite S para SUBSTITUIR os clientes atuais.\n" +
+        "Digite M para MESCLAR com os clientes atuais.\n" +
+        "Clique em Cancelar para desistir."
+      );
+
+      if (choice === null) return;
+      const mode = choice.trim().toUpperCase();
+      if (mode !== "S" && mode !== "M") {
+        notify("Importação cancelada. Digite S ou M.", true);
+        return;
+      }
+
+      if (mode === "S" && clients.length) {
+        if (!confirm(
+          "Atenção: os clientes atuais serão substituídos.\n\n" +
+          "Recomendamos clicar em Exportar .db antes de continuar.\n\n" +
+          "Deseja realmente substituir?"
+        )) return;
+      }
+
+      let nextClients;
+      if (mode === "S") {
+        nextClients = imported.clients;
+      } else {
+        const known = new Set(clients.map(c => text(c.id)));
+        nextClients = [...clients];
+        for (const client of imported.clients) {
+          if (!known.has(text(client.id))) {
+            nextClients.push(client);
+            known.add(text(client.id));
+          }
+        }
+      }
+
+      /*
+       * Ao substituir, importa também a configuração/PIX quando existir.
+       * Ao mesclar, mantém a configuração atual.
+       */
+      const nextConfig = mode === "S" && imported.config
+        ? { ...config, ...imported.config }
+        : config;
+
+      try {
+        localStorage.setItem(KEY_CLIENTS, JSON.stringify(nextClients));
+        if (nextConfig !== config) {
+          localStorage.setItem(KEY_CONFIG, JSON.stringify(nextConfig));
+        }
+      } catch {
+        notify("Não há espaço suficiente para importar o backup.", true);
+        return;
+      }
+
+      saveHistorySnapshot();
+      clients = nextClients;
+      config = nextConfig;
+      render();
+      renderHistory();
+      closeModal("backup-modal");
+      notify(`Backup importado: ${clients.length} cliente(s) no painel.`);
+    } catch (error) {
+      notify(`Falha na importação: ${error.message}`, true);
+    }
+  };
+
+  reader.readAsText(file, "UTF-8");
+}
+
+function renderHistory() {
+  const list = $("history-list");
+  list.replaceChildren();
+
+  if (!history.length) {
+    list.textContent = "Ainda não há cópias recentes neste navegador.";
+    return;
+  }
+
+  history.forEach(entry => {
+    if (!entry || !entry.snapshot) return;
+
+    const line = document.createElement("div");
+    line.className = "history-item";
+
+    const label = document.createElement("span");
+    const date = new Date(entry.date);
+    label.textContent =
+      `${Number.isNaN(date.getTime()) ? "Data desconhecida" : date.toLocaleString("pt-BR")}` +
+      ` · ${entry.total ?? "?"} cliente(s)`;
+
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "btn small outline";
+    button.textContent = "Restaurar";
+    button.addEventListener("click", () => {
+      if (!confirm("Restaurar esta cópia? Os clientes atuais serão substituídos.")) return;
+      try {
+        const parsed = validateBackup(JSON.parse(entry.snapshot));
+        const nextConfig = parsed.config
+          ? { ...config, ...parsed.config }
+          : config;
+
+        localStorage.setItem(KEY_CLIENTS, JSON.stringify(parsed.clients));
+        localStorage.setItem(KEY_CONFIG, JSON.stringify(nextConfig));
+        clients = parsed.clients;
+        config = nextConfig;
+        render();
+        notify("Cópia restaurada.");
+      } catch (error) {
+        notify(`Falha ao restaurar: ${error.message}`, true);
+      }
+    });
+
+    line.append(label, button);
+    list.appendChild(line);
+  });
+}
+
+function openBackup() {
+  renderHistory();
+  openModal("backup-modal");
+}
+
+/* UTILITÁRIOS E EVENTOS */
+
+async function copyText(value) {
+  if (!value) {
+    notify("Não há conteúdo para copiar.", true);
+    return;
+  }
+  try {
+    if (navigator.clipboard && window.isSecureContext) {
+      await navigator.clipboard.writeText(text(value));
+    } else {
+      const input = document.createElement("textarea");
+      input.value = text(value);
+      input.style.position = "fixed";
+      input.style.opacity = "0";
+      document.body.appendChild(input);
+      input.select();
+      if (!document.execCommand("copy")) throw new Error("Cópia indisponível");
+      input.remove();
+    }
+    notify("Copiado para a área de transferência.");
+  } catch {
+    notify("Não foi possível copiar automaticamente. Selecione e copie o texto manualmente.", true);
+  }
+}
+
+$("add-client").addEventListener("click", () => openClientForm());
+$("open-config").addEventListener("click", openConfig);
+$("open-backup").addEventListener("click", openBackup);
+$("open-pix").addEventListener("click", () => openPix());
+$("quick-export").addEventListener("click", () => exportBackup("db"));
+$("search").addEventListener("input", render);
+$("filter").addEventListener("change", render);
+$("sort").addEventListener("change", render);
+
+$("collect").addEventListener("click", () => {
+  $("filter").value = "soon";
+  render();
+  notify("Mostrando clientes que vencem em até 7 dias. Use 💬 para enviar cada cobrança.");
+});
+
+document.querySelectorAll(".export-btn").forEach(button => {
+  button.addEventListener("click", () => exportBackup(button.dataset.ext));
+});
+
+$("import-button").addEventListener("click", () => $("import-file").click());
+
+$("import-file").addEventListener("change", event => {
+  const file = event.target.files?.[0];
+  if (file) importBackup(file);
+  event.target.value = "";
+});
+
+document.querySelectorAll(".close-modal").forEach(button => {
+  button.addEventListener("click", () => {
+    closeModal(button.closest(".modal").id);
+  });
+});
+
+document.querySelectorAll(".modal").forEach(modal => {
+  modal.addEventListener("click", event => {
+    if (event.target === modal) closeModal(modal.id);
+  });
+});
+
+document.addEventListener("keydown", event => {
+  if (event.key === "Escape") {
+    document.querySelectorAll(".modal.open").forEach(modal => closeModal(modal.id));
+  }
+  if (event.ctrlKey && event.key.toLowerCase() === "n") {
+    event.preventDefault();
+    openClientForm();
+  }
+  if (event.ctrlKey && event.key.toLowerCase() === "b") {
+    event.preventDefault();
+    openBackup();
+  }
+  if (event.ctrlKey && event.key.toLowerCase() === "s") {
+    event.preventDefault();
+    exportBackup("db");
+  }
+});
+
+render();
+</script>
+</body>
+</html>
